@@ -38,3 +38,24 @@ def test_head_commit_sha():
         repo = GitRepository(path=tmpdirname)
         with pytest.raises(GitError, match=f"{tmpdirname} is not a git repository"):
             repo.head_commit_sha() is not None
+
+
+def test_create_delete_branch(repository):
+    all_branches = repository.branches(all=True)
+    print("Initial branches:", all_branches)
+
+    default_branch = repository.get_default_branch()
+    assert default_branch in all_branches, f"Default branch ({default_branch}) not found"  
+
+    new_branch_name = "test_branch"
+    repository.create_branch(new_branch_name)
+
+    all_branches = repository.branches(all=True)
+    print("Branches after creating a new branch:", all_branches)
+    assert new_branch_name in all_branches, f"Branch {new_branch_name} was not created"
+    
+    repository.delete_branch(new_branch_name)
+
+    all_branches = repository.branches(all=True)
+    print("Branches after deleting the new branch:", all_branches)
+    assert new_branch_name not in all_branches, f"Branch {new_branch_name} was not deleted"
